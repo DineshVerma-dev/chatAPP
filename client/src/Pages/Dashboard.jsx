@@ -6,7 +6,6 @@ const Dashboard = () => {
   const [activeTab, setActiveTab] = useState('home');
   const [usersData, setUsersData] = useState([]);
 
-  // Fetch user data from the backend
   useEffect(() => {
     const fetchUsers = async () => {
       try {
@@ -21,58 +20,39 @@ const Dashboard = () => {
     fetchUsers();
   }, []);
 
-  // Assuming the logged-in user's info is passed through context or props
-  const userInfo = { username: 'JohnDoe', fullname: 'John Doe', profilePic: 'https://randomuser.me/api/portraits/men/1.jpg' };
+  const userInfo = {
+    username: 'JohnDoe',
+    fullname: 'John Doe',
+    profilePic: 'https://randomuser.me/api/portraits/men/1.jpg',
+  };
 
-  // Handle user selection for chatting
   const handleUserSelection = (user) => {
     setSelectedUser(user);
   };
 
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className="flex flex-col md:flex-row h-screen bg-gray-100">
       {/* Sidebar */}
-      <aside className="w-1/4 bg-blue-600 text-white flex flex-col p-6 space-y-6">
+      <aside className="w-full md:w-1/4 bg-blue-600 text-white p-6 space-y-6 flex-shrink-0">
         <h2 className="text-3xl font-bold">Chat App</h2>
-        <p className="text-lg mt-2">Welcome, {userInfo.fullname}</p> {/* Display Full Name */}
+        <p className="text-lg mt-2">Welcome, {userInfo.fullname}</p>
         <ul className="space-y-4 mt-4">
-          <li
-            className={`cursor-pointer p-2 rounded-lg hover:bg-blue-500 transition duration-200 ${
-              activeTab === 'home' ? 'bg-blue-500' : ''
-            }`}
-            onClick={() => setActiveTab('home')}
-          >
-            Home
-          </li>
-          <li
-            className={`cursor-pointer p-2 rounded-lg hover:bg-blue-500 transition duration-200 ${
-              activeTab === 'chat' ? 'bg-blue-500' : ''
-            }`}
-            onClick={() => setActiveTab('chat')}
-          >
-            Chats
-          </li>
-          <li
-            className={`cursor-pointer p-2 rounded-lg hover:bg-blue-500 transition duration-200 ${
-              activeTab === 'profile' ? 'bg-blue-500' : ''
-            }`}
-            onClick={() => setActiveTab('profile')}
-          >
-            Profile
-          </li>
-          <li
-            className={`cursor-pointer p-2 rounded-lg hover:bg-blue-500 transition duration-200 ${
-              activeTab === 'settings' ? 'bg-blue-500' : ''
-            }`}
-            onClick={() => setActiveTab('settings')}
-          >
-            Settings
-          </li>
+          {['home', 'chat', 'profile', 'settings'].map((tab) => (
+            <li
+              key={tab}
+              className={`cursor-pointer p-2 rounded-lg hover:bg-blue-500 transition duration-200 ${
+                activeTab === tab ? 'bg-blue-500' : ''
+              }`}
+              onClick={() => setActiveTab(tab)}
+            >
+              {tab.charAt(0).toUpperCase() + tab.slice(1)}
+            </li>
+          ))}
         </ul>
 
-        {/* Users List (display in sidebar) */}
+        {/* Users List */}
         <div className="mt-8">
-          <h3 className="text-xl font-semibold text-white">Users</h3>
+          <h3 className="text-xl font-semibold">Users</h3>
           <ul className="space-y-2 mt-4">
             {usersData.map((user) => (
               <li
@@ -83,23 +63,21 @@ const Dashboard = () => {
                 onClick={() => handleUserSelection(user)}
               >
                 <img
-                  src={user.profilePic || 'default_profile_pic_url'} // Default profile picture if none available
+                  src={user.profilePic || 'default_profile_pic_url'}
                   alt={user.name}
                   className="w-8 h-8 rounded-full object-cover"
                 />
-                <span className="text-white">{user.name} - {user.online ? 'Online' : 'Offline'}</span>
+                <span>{user.name} - {user.online ? 'Online' : 'Offline'}</span>
               </li>
             ))}
           </ul>
         </div>
       </aside>
 
-      <main className="flex-1 p-6 ml-1/4">
-        <h1 className="text-4xl font-bold text-gray-700">
-          {activeTab === 'home' && 'Home'}
-          {activeTab === 'chat' && 'Chats'}
-          {activeTab === 'profile' && 'Profile'}
-          {activeTab === 'settings' && 'Settings'}
+      {/* Main Content */}
+      <main className="flex-1 p-6">
+        <h1 className="text-4xl font-bold text-gray-700 mb-4">
+          {activeTab.charAt(0).toUpperCase() + activeTab.slice(1)}
         </h1>
 
         {/* Chat Section */}

@@ -59,7 +59,10 @@ const SignUp = () => {
     setIsSubmitting(true);
 
     // Check if form is valid
-    if (!Object.values(errors).some((error) => error !== '') && Object.values(formData).every((value) => value !== '')) {
+    if (
+      !Object.values(errors).some((error) => error !== '') &&
+      Object.values(formData).every((value) => value !== '')
+    ) {
       alert('Form Submitted!');
       // Handle form submission logic
     } else {
@@ -69,8 +72,8 @@ const SignUp = () => {
   };
 
   return (
-    <div className="flex h-screen bg-gradient-to-r from-green-500 to-teal-600 items-center justify-center">
-      <div className="w-full max-w-md p-8 space-y-6 bg-white rounded-lg shadow-lg">
+    <div className="flex h-screen items-center justify-center bg-gradient-to-r from-green-500 to-teal-600 px-4 sm:px-6 lg:px-8">
+      <div className="w-full max-w-sm md:max-w-md p-8 space-y-6 bg-white rounded-lg shadow-lg transform hover:scale-105 transition duration-300 ease-in-out">
         <h2 className="text-3xl font-extrabold text-center text-gray-800">Sign Up</h2>
         <form className="space-y-4" onSubmit={handleSubmit}>
           <div>
@@ -80,7 +83,11 @@ const SignUp = () => {
               name="username"
               value={formData.username}
               onChange={handleChange}
-              className={`w-full px-4 py-2 mt-2 border rounded-lg focus:outline-none focus:ring-2 ${errors.username ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-teal-500'}`}
+              className={`w-full px-4 py-2 mt-2 border rounded-lg focus:outline-none focus:ring-2 ${
+                errors.username
+                  ? 'border-red-500 focus:ring-red-500'
+                  : 'border-gray-300 focus:ring-teal-500'
+              }`}
               placeholder="Enter your username"
             />
             {errors.username && <p className="text-red-500 text-xs">{errors.username}</p>}
@@ -93,7 +100,11 @@ const SignUp = () => {
               name="fullName"
               value={formData.fullName}
               onChange={handleChange}
-              className={`w-full px-4 py-2 mt-2 border rounded-lg focus:outline-none focus:ring-2 ${errors.fullName ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-teal-500'}`}
+              className={`w-full px-4 py-2 mt-2 border rounded-lg focus:outline-none focus:ring-2 ${
+                errors.fullName
+                  ? 'border-red-500 focus:ring-red-500'
+                  : 'border-gray-300 focus:ring-teal-500'
+              }`}
               placeholder="Enter your full name"
             />
             {errors.fullName && <p className="text-red-500 text-xs">{errors.fullName}</p>}
@@ -106,7 +117,11 @@ const SignUp = () => {
               name="email"
               value={formData.email}
               onChange={handleChange}
-              className={`w-full px-4 py-2 mt-2 border rounded-lg focus:outline-none focus:ring-2 ${errors.email ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-teal-500'}`}
+              className={`w-full px-4 py-2 mt-2 border rounded-lg focus:outline-none focus:ring-2 ${
+                errors.email
+                  ? 'border-red-500 focus:ring-red-500'
+                  : 'border-gray-300 focus:ring-teal-500'
+              }`}
               placeholder="Enter your email"
             />
             {errors.email && <p className="text-red-500 text-xs">{errors.email}</p>}
@@ -119,7 +134,11 @@ const SignUp = () => {
               name="password"
               value={formData.password}
               onChange={handleChange}
-              className={`w-full px-4 py-2 mt-2 border rounded-lg focus:outline-none focus:ring-2 ${errors.password ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-teal-500'}`}
+              className={`w-full px-4 py-2 mt-2 border rounded-lg focus:outline-none focus:ring-2 ${
+                errors.password
+                  ? 'border-red-500 focus:ring-red-500'
+                  : 'border-gray-300 focus:ring-teal-500'
+              }`}
               placeholder="Create a password"
             />
             {errors.password && <p className="text-red-500 text-xs">{errors.password}</p>}
@@ -128,7 +147,11 @@ const SignUp = () => {
           <button
             type="submit"
             disabled={isSubmitting}
-            className={`w-full py-2 text-white ${isSubmitting ? 'bg-teal-400 cursor-not-allowed' : 'bg-teal-600 hover:bg-teal-700'} rounded-lg transition duration-200`}
+            className={`w-full py-2 text-white ${
+              isSubmitting
+                ? 'bg-teal-400 cursor-not-allowed'
+                : 'bg-teal-600 hover:bg-teal-700'
+            } rounded-lg transition duration-200`}
           >
             {isSubmitting ? 'Submitting...' : 'Sign Up'}
           </button>
@@ -136,7 +159,10 @@ const SignUp = () => {
 
         <p className="text-center text-sm text-gray-600">
           Already have an account?{' '}
-          <a href="/signin" className="text-teal-500 hover:text-teal-700 transition duration-200">
+          <a
+            href="/signin"
+            className="text-teal-500 hover:text-teal-700 transition duration-200"
+          >
             Sign In
           </a>
         </p>
