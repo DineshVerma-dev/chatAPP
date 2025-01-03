@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { type } from "os";
+
 
 
 const ChatSchema = mongoose.Schema({
