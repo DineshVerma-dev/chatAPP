@@ -140,13 +140,13 @@ export const removeFromGroup = asyncHandler(async (req, res) => {
         { new: true }
     )
         .populate("users", "-password")
-        .populate("groupadmin", "-password"); // Ensure the correct field is populated
+        .populate("groupadmin", "-password"); 
 
     if (!removed) {
         res.status(404);
         throw new Error("Chat Not Found");
     } else {
-        res.json(removed); // Directly return the populated object
+        res.json(removed); 
     }
 });
 
@@ -159,13 +159,13 @@ export const addToGroup = asyncHandler(async (req, res) => {
         { new: true }
     )
          .populate("users", "-password")
-         .populate("groupadmin", "-password"); // Ensure the correct field is populated
+         .populate("groupadmin", "-password");
 
     if (!added) {
         res.status(404);
         throw new Error("Chat Not Found");
     } else {
-        res.json(added); // Directly return the populated object
+        res.json(added); 
     }
 });
 
