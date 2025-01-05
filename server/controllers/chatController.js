@@ -3,51 +3,7 @@ import asyncHandler from "express-async-handler";
 import { ChatModel } from "../models/ChatModel.js"
 import { UserModel } from "../models/UserModel.js";
 
-// export const accessChat = asyncHandler(async (req, res) => {
-//     const { userId } = req.body;
 
-//     if (!userId) {
-//         console.log("UserId param not sent with request");
-//         return res.sendStatus(400);
-//     }
-
-//     let isChat = await ChatModel.find({
-//         isGroupChat: false,
-//         $and: [
-//             { users: { $elemMatch: { $eq: req.user._id } } },
-//             { users: { $elemMatch: { $eq: userId } } },
-//         ],
-//     })
-//         .populate("users", "-password")
-//         .populate("latestMessage");
-
-//     isChat = await UserModel.populate(isChat, {
-//         path: "latestMessage.sender",
-//         select: "username picture email",
-//     });
-
-//     if (isChat.length > 0) {
-//         res.send(isChat[0]);
-//     } else {
-//         const chatData = {
-//             chatName: "sender",
-//             isGroupChat: false,
-//             users: [req.user._id, userId],
-//         };
-
-//         try {
-//             const createdChat = await ChatModel.create(chatData);
-//             const fullChat = await ChatModel.findOne({ _id: createdChat._id }).populate(
-//                 "users",
-//                 "-password"
-//             );
-//             res.status(200).json(fullChat);
-//         } catch (error) {
-//             res.status(400);
-//             throw new Error(error.message);
-//         }
-//     }
-// });
 
 export const accessChat = asyncHandler(async (req, res) => {
     console.log(req.user); // Log to check if req.user is set
@@ -82,7 +38,7 @@ export const accessChat = asyncHandler(async (req, res) => {
         res.send(isChat[0]);
     } else {
         const chatData = {
-            chatName: "sender",
+            chatname: "sender",
             isGroupChat: false,
             users: [req.user._id, userId],
         };
@@ -105,38 +61,50 @@ export const allChats = asyncHandler(async (req, res) => {
     try {
         const chats = await ChatModel.find({ users: { $elemMatch: { $eq: req.user._id } } })
             .populate("users", "-password")
-            .populate("latestMessage")
-            .sort({ updatedAt: -1 });
+            .populate("groupadmin", "-password")
+            .populate("latestmessage")
+            .sort({ updatedAt: -1 })
+            .then(async (results) => {
+                results = await UserModel.populate(results, {
+                    path: "latestMessage.sender",
+                    select: "name pic email",
+                });
+                res.status(200).send(results);
+            });
 
-        res.status(200).send(chats);
     } catch (error) {
         res.status(400);
         throw new Error(error.message);
     }
 });
 
+
 export const createGroupChat = asyncHandler(async (req, res) => {
     if (!req.body.users || !req.body.name) {
-        return res.status(400).send({ message: "Please fill all the fields" });
+        return res.status(400).send({ message: "Please Fill all the feilds" });
     }
 
-    const users = JSON.parse(req.body.users);
+    var users = JSON.parse(req.body.users);
 
     if (users.length < 2) {
-        return res.status(400).send("More than 2 users are required to form a group chat");
+        return res
+            .status(400)
+            .send("More than 2 users are required to form a group chat");
     }
 
     users.push(req.user);
 
     try {
         const groupChat = await ChatModel.create({
-            chatName: req.body.name,
+            chatname: req.body.name,
             users: users,
-            isGroupChat: true,
+            isgroupchat: true,
+            groupadmin: req.user,
         });
 
         const fullGroupChat = await ChatModel.findOne({ _id: groupChat._id })
-            .populate("users", "-password");
+            .populate("users", "-password")
+            .populate("groupadmin", "-password");
 
         res.status(200).json(fullGroupChat);
     } catch (error) {
@@ -150,7 +118,7 @@ export const renameGroup = asyncHandler(async (req, res) => {
 
     const updatedChat = await ChatModel.findByIdAndUpdate(
         chatId,
-        { chatName: chatName },
+        { chatname: chatName },
         { new: true }
     )
         .populate("users", "-password");
@@ -171,7 +139,8 @@ export const removeFromGroup = asyncHandler(async (req, res) => {
         { $pull: { users: userId } },
         { new: true }
     )
-        .populate("users", "-password");
+        .populate("users", "-password")
+        .populate("groupadmin", "-password");
 
     if (!removed) {
         res.status(404);
@@ -189,7 +158,8 @@ export const addToGroup = asyncHandler(async (req, res) => {
         { $push: { users: userId } },
         { new: true }
     )
-        .populate("users", "-password");
+        .populate("users", "-password")
+        .populate("groupadmin", "-password"); // Ensure correct field name
 
     if (!added) {
         res.status(404);
@@ -198,3 +168,4 @@ export const addToGroup = asyncHandler(async (req, res) => {
         res.json(added);
     }
 });
+

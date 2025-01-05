@@ -5,11 +5,11 @@ const router = Router();
 
 
 router.route("/").post(jwtAuthMiddleware, accessChat)
-router.route("/").get(allChats)
+router.route("/").get(jwtAuthMiddleware,allChats)
 router.route("/group").post(createGroupChat)
 router.route("/rename").put(renameGroup)
-router.route("/groupremove").put(removeFromGroup)
-router.route("/groupadd").put(addToGroup)
+router.route("/removefromgroup").put(removeFromGroup)
+router.route("/addtogroup").put(addToGroup)
 
 
 
