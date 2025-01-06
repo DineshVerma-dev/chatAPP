@@ -1,7 +1,7 @@
 import asyncHandler from "express-async-handler";
 import { MessageModel } from "../models/MessageModel.js";
 import { ChatModel } from "../models/ChatModel.js";
-
+import { io, getReceiverSocketId } from "../utils/socket.js";
 
 
 export const allMessages = asyncHandler(async (req, res) => {
@@ -28,10 +28,8 @@ export const sendMessage = asyncHandler(async (req, res) => {
     };
 
     try {
-        // Create a new message
         const createdMessage = await MessageModel.create(newMessage);
 
-        // Populate sender, chat, and users in the chat
         const message = await MessageModel.findById(createdMessage._id)
             .populate("sender", "username picture")
             .populate({
@@ -39,10 +37,13 @@ export const sendMessage = asyncHandler(async (req, res) => {
                 populate: { path: "users", select: "username picture email" },
             });
 
-        // Update the latest message in the chat
         await ChatModel.findByIdAndUpdate(chatId, { latestmessage: message });
 
-        // Return the populated message
+        const receiverSocketId = getReceiverSocketId(chatId);
+        if (receiverSocketId) {
+            io.to(receiverSocketId).emit("newMessage", message);
+        }
+
         res.status(200).json(message);
     } catch (error) {
         res.status(400);
