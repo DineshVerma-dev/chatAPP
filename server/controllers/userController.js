@@ -1,7 +1,7 @@
 import { UserModel } from "../models/UserModel.js";
 import asyncHandler from "express-async-handler";
 import { z } from "zod";
-import jwt from "jsonwebstoken"
+import jwt from "jsonwebtoken"
 
 const userSchema = z.object({
     username: z.string().min(3, "Username must be at least 3 characters long"),

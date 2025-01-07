@@ -1,104 +1,146 @@
-import React, { useState, useEffect } from 'react';
-import Chat from '../Components/chat.jsx';
+import React, { useState, useEffect } from "react";
+import { io } from "socket.io-client";
 
 const Dashboard = () => {
+  const [currentUser, setCurrentUser] = useState(""); // Stores the logged-in user's name
+  const [searchTerm, setSearchTerm] = useState(""); // Stores the search query
+  const [filteredUsers, setFilteredUsers] = useState([]); // Stores the filtered list of users
+  const [users, setUsers] = useState([]); // Stores all users
   const [selectedUser, setSelectedUser] = useState(null);
-  const [activeTab, setActiveTab] = useState('home');
-  const [usersData, setUsersData] = useState([]);
+  const [message, setMessage] = useState("");
+  const [messages, setMessages] = useState([]);
+
+  const socket = io("http://localhost:3000"); // Replace with your backend URL
 
   useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const response = await fetch('http://localhost:5000/api/users');
-        const data = await response.json();
-        setUsersData(data);
-      } catch (error) {
-        console.error('Error fetching users:', error);
-      }
+    // Connect to the backend
+    socket.on("connect", () => {
+      console.log("Connected to server");
+
+      // Fetch the current logged-in user's details
+      socket.emit("getCurrentUser");
+      socket.on("currentUser", (user) => {
+        setCurrentUser(user.username); // Set the current user's name
+      });
+
+      // Fetch the list of all users
+      socket.emit("getUsers");
+      socket.on("usersList", (userList) => {
+        setUsers(userList);
+        setFilteredUsers(userList); // Initialize filtered users list
+      });
+
+      // Listen for incoming messages
+      socket.on("receiveMessage", (data) => {
+        setMessages((prevMessages) => [...prevMessages, data]);
+      });
+    });
+
+    return () => {
+      socket.disconnect();
     };
+  }, [socket]);
 
-    fetchUsers();
-  }, []);
-
-  const userInfo = {
-    username: 'JohnDoe',
-    fullname: 'John Doe',
-    profilePic: 'https://randomuser.me/api/portraits/men/1.jpg',
-  };
-
-  const handleUserSelection = (user) => {
+  const handleUserSelect = (user) => {
     setSelectedUser(user);
   };
 
+  const handleSendMessage = () => {
+    if (selectedUser && message.trim()) {
+      const newMessage = { to: selectedUser, text: message };
+      socket.emit("sendMessage", newMessage);
+      setMessages((prev) => [...prev, { from: "Me", text: message }]);
+      setMessage("");
+    }
+  };
+
+  const handleSearch = (e) => {
+    setSearchTerm(e.target.value);
+    const filtered = users.filter((user) =>
+      user.toLowerCase().includes(e.target.value.toLowerCase())
+    );
+    setFilteredUsers(filtered);
+  };
+
   return (
-    <div className="flex flex-col md:flex-row h-screen bg-gray-100">
+    <div className="min-h-screen bg-black text-white flex">
       {/* Sidebar */}
-      <aside className="w-full md:w-1/4 bg-blue-600 text-white p-6 space-y-6 flex-shrink-0">
-        <h2 className="text-3xl font-bold">Chat App</h2>
-        <p className="text-lg mt-2">Welcome, {userInfo.fullname}</p>
-        <ul className="space-y-4 mt-4">
-          {['home', 'chat', 'profile', 'settings'].map((tab) => (
-            <li
-              key={tab}
-              className={`cursor-pointer p-2 rounded-lg hover:bg-blue-500 transition duration-200 ${
-                activeTab === tab ? 'bg-blue-500' : ''
-              }`}
-              onClick={() => setActiveTab(tab)}
+      <div className="w-1/3 border-r border-gray-600 p-4">
+        <h1 className="text-2xl font-bold text-orange-400 mb-4">Chat App</h1>
+        <p className="text-purple-400 mb-4">Welcome, {currentUser || "Loading..."}</p>
+        <h2 className="text-lg font-semibold text-purple-400 mb-2">
+          Search Users
+        </h2>
+        <input
+          type="text"
+          value={searchTerm}
+          onChange={handleSearch}
+          placeholder="Search for users..."
+          className="w-full p-2 mb-4 border rounded bg-gray-800 text-white"
+        />
+        <div className="space-y-2">
+          {filteredUsers.map((user, index) => (
+            <div
+              key={index}
+              className={`flex items-center p-2 border rounded ${
+                selectedUser === user ? "border-purple-400" : "border-gray-600"
+              } cursor-pointer`}
+              onClick={() => handleUserSelect(user)}
             >
-              {tab.charAt(0).toUpperCase() + tab.slice(1)}
-            </li>
+              <div className="w-4 h-4 rounded-full bg-gray-600 mr-2"></div>
+              <span>{user}</span>
+            </div>
           ))}
-        </ul>
-
-        {/* Users List */}
-        <div className="mt-8">
-          <h3 className="text-xl font-semibold">Users</h3>
-          <ul className="space-y-2 mt-4">
-            {usersData.map((user) => (
-              <li
-                key={user._id}
-                className={`cursor-pointer p-2 rounded-lg flex items-center space-x-4 ${
-                  user.online ? 'bg-green-500' : 'bg-gray-400'
-                } hover:bg-green-400 transition duration-200`}
-                onClick={() => handleUserSelection(user)}
-              >
-                <img
-                  src={user.profilePic || 'default_profile_pic_url'}
-                  alt={user.name}
-                  className="w-8 h-8 rounded-full object-cover"
-                />
-                <span>{user.name} - {user.online ? 'Online' : 'Offline'}</span>
-              </li>
-            ))}
-          </ul>
         </div>
-      </aside>
+      </div>
 
-      {/* Main Content */}
-      <main className="flex-1 p-6">
-        <h1 className="text-4xl font-bold text-gray-700 mb-4">
-          {activeTab.charAt(0).toUpperCase() + activeTab.slice(1)}
-        </h1>
+      {/* Chat Section */}
+      <div className="w-2/3 p-4 flex flex-col">
+        {/* Selected User */}
+        <div className="mb-4">
+          {selectedUser ? (
+            <h2 className="text-lg font-semibold">
+              Chat with <span className="text-purple-400">{selectedUser}</span>
+            </h2>
+          ) : (
+            <h2 className="text-lg font-semibold">Select a user to start chat</h2>
+          )}
+        </div>
 
-        {/* Chat Section */}
-        {activeTab === 'chat' && (
-          <div className="mt-8 flex flex-col">
-            <h3 className="text-2xl font-semibold text-gray-800">
-              {selectedUser ? `Chatting with ${selectedUser.name}` : 'Select a user to chat with'}
-            </h3>
+        {/* Chat Box */}
+        <div className="flex-1 border border-gray-600 rounded p-4 space-y-4 overflow-y-auto">
+          {messages.map((chat, index) => (
+            <div
+              key={index}
+              className={`border border-gray-600 rounded p-2 ${
+                chat.from === "Me" ? "text-green-400" : "text-gray-300"
+              }`}
+            >
+              {chat.from}: {chat.text}
+            </div>
+          ))}
+        </div>
 
-            {selectedUser ? (
-              <div className="mt-4 flex-1 bg-white p-4 rounded-lg shadow-md">
-                <Chat selectedUser={selectedUser} />
-              </div>
-            ) : (
-              <div className="mt-4 text-gray-600">Please select a user to start chatting.</div>
-            )}
-          </div>
-        )}
-      </main>
+        {/* Message Input */}
+        <div className="mt-4 flex items-center">
+          <input
+            type="text"
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            placeholder="Input to send"
+            className="flex-1 p-2 border rounded bg-gray-800 text-white"
+          />
+          <button
+            onClick={handleSendMessage}
+            className="ml-2 bg-purple-500 text-white px-4 py-2 rounded"
+          >
+            Send
+          </button>
+        </div>
+      </div>
     </div>
   );
 };
 
 export default Dashboard;
+
