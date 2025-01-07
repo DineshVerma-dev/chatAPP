@@ -1,14 +1,12 @@
 import mongoose from "mongoose";
 
-
-
 const ChatSchema = mongoose.Schema({
     chatname: {
         type: String,
         trim: true,
     },
     isgroupchat: {
-        type: boolean,
+        type: Boolean,
         default: false,
     },
     users: [{
@@ -23,8 +21,8 @@ const ChatSchema = mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "UserModel"
     }
-}, { timestamps: true })
+}, { timestamps: true });
 
 const ChatModel = mongoose.model("ChatModel", ChatSchema);
 
-export {ChatModel}
+export { ChatModel }
