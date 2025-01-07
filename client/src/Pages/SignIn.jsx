@@ -1,10 +1,12 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link , useNavigate} from 'react-router-dom';
 import axios from 'axios';
+
 
 const SignIn = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+ const navigate = useNavigate()
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -15,7 +17,10 @@ const SignIn = () => {
       });
       localStorage.setItem("token", response.data.token);
       console.log("Login successful:", response.data);
-      alert("Logged in successfully!");
+      console.log("Login successful:", response.data.username);
+      // <Users currentUser={response.data.username}/>
+      navigate("/dashboard", { state: { currentUser: response.data.username } });
+
     } catch (error) {
       console.error('Login error:', error);
       alert("Invalid credentials or server error.");

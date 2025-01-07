@@ -4,8 +4,9 @@ import { registerUser, loginUser, getUserProfile, allUsers } from '../controller
 const router = Router();
 
 
-router.route("/register").post(registerUser).get(allUsers);
-router.route("/login").post(loginUser).get(allUsers);
+router.route("/register").post(registerUser);
+router.route("/allusers").get(allUsers);
+router.route("/login").post(loginUser);
 router.get('/profile', getUserProfile);
 
 
