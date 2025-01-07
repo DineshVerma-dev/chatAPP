@@ -1,55 +1,54 @@
 import asyncHandler from "express-async-handler";
 import { MessageModel } from "../models/MessageModel.js";
-import { ChatModel } from "../models/ChatModel.js";
 import { io, getReceiverSocketId } from "../utils/socket.js";
 
 
-export const allMessages = asyncHandler(async (req, res) => {
-    const messages = await MessageModel.find({ chat: req.params.chatId })
-        .populate("sender", "username picture email")
-        .populate("chat");
 
-    res.json(messages);
+export const allMessages = asyncHandler(async (req, res) => {
+    try {
+        const { id: userToChatId } = req.params;
+        const myId = req.user._id;
+
+        const messages = await MessageModel.find({
+            $or: [
+                { senderId: myId, receiverId: userToChatId },
+                { senderId: userToChatId, receiverId: myId },
+            ],
+        });
+        if(!messages){
+            res.json({messages : "not found any message"})
+        }
+        res.status(200).json(messages);
+    } catch (error) {
+        console.log("Error in getMessages controller: ", error.message);
+        res.status(500).json({ error: "Internal server error" });
+    }
 });
 
 export const sendMessage = asyncHandler(async (req, res) => {
-    const { content, chatId } = req.body;
-
-    // Validate input
-    if (!content || !chatId) {
-        console.log("Invalid data passed into request");
-        return res.status(400).json({ message: "Content and chatId are required" });
-    }
-
-    const newMessage = {
-        sender: req.user._id,
-        content: content,
-        chat: chatId,
-    };
-
     try {
-        const createdMessage = await MessageModel.create(newMessage);
+        const senderId = req.user._id;
+        const { content } = req.body;
+        const { receiverId } = req.body;
 
-        const message = await MessageModel.findById(createdMessage._id)
-            .populate("sender", "username picture")
-            .populate({
-                path: "chat",
-                populate: { path: "users", select: "username picture email" },
-            });
 
-        await ChatModel.findByIdAndUpdate(chatId, { latestmessage: message });
+        const newMessage = new MessageModel({
+            senderId,
+            receiverId,
+            content,
+        });
 
-        const receiverSocketId = getReceiverSocketId(chatId);
+        await newMessage.save();
+
+        const receiverSocketId = getReceiverSocketId(receiverId);
+        console.log("receiverid ", receiverSocketId)
         if (receiverSocketId) {
-            io.to(receiverSocketId).emit("newMessage", message);
+            io.to(receiverSocketId).emit("newMessage", newMessage);
         }
 
-        res.status(200).json(message);
+        res.status(201).json(newMessage);
     } catch (error) {
-        res.status(400);
-        throw new Error(error.message);
+        console.log("Error in sendMessage controller: ", error.message);
+        res.status(500).json({ error: "Internal server error" });
     }
 });
-
-
-
