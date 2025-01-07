@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import Chat from '../Components/chat.jsx';
+import Chat from '../Components/Chat.jsx';
 
 const Dashboard = () => {
   const [selectedUser, setSelectedUser] = useState(null);
