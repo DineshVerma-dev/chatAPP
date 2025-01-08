@@ -98,17 +98,19 @@ const SignIn = () => {
       });
 
       // Extract data from the response
-      const { token, userId, username } = response.data;
+      const { token, _id, username } = response.data;
 
       // Store token and userId in localStorage
       localStorage.setItem("token", token);
-      
-
+      localStorage.setItem("userId",_id);
+     
       console.log("Login successful:", username);
+      console.log("Login successful:", _id);
+      console.log("Login successful:", response);
 
       // Initialize the socket connection with the userId
       const newSocket = io("http://localhost:3000", {
-        query: { userId },
+        query: { _id },
       });
       setSocket(newSocket); // Store the socket instance in state
 

@@ -90,20 +90,22 @@ const SignUp = () => {
       });
 
       // Extract userId and token from the response
-      const { userId, token } = response.data;
+      const {  token , _id } = response.data;
 
       // Store the token and userId in localStorage
       localStorage.setItem("token", token);
-      localStorage.setItem("userId", userId);
+      localStorage.setItem("userId", _id);
 
       console.log("Registration successful:", response.data);
 
       // Initialize socket connection with the userId
       const newSocket = io("http://localhost:3000", {
-        query: { userId },
+        query: { _id },
       });
       setSocket(newSocket); // Store the socket instance in state
-
+      newSocket.on("getOnlineUsers", (userId) => {
+        console.log("Online users:", userId);
+      });
       // Navigate to the dashboard
       navigate("/dashboard");
 
@@ -124,8 +126,11 @@ const SignUp = () => {
         console.log("Socket disconnected");
       });
 
-      
+      socket.on("getOnlineUsers", (userId) => {
+        console.log("Online users:", userId);
+      });
     }
+
   }, []);
 
   return (
