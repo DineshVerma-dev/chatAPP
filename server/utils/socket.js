@@ -14,22 +14,20 @@ const io = new Server(server, {
     },
 });
 
+
 export function getReceiverSocketId(userId) {
     console.log("Looking for userId in userSocketMap:", userId);
     console.log("Current userSocketMap:", userSocketMap);
     return userSocketMap[userId];
 }
 
-
-
 const userSocketMap = {}; // {userId: socketId}
-
 io.on("connection", (socket) => {
     console.log("A user connected", socket.id);
 
     const userId = socket.handshake.query._id;
-    
-     console.log("server io.on ", userId)
+
+    console.log("server not geeting id from the client ", userId)
     if (userId) {
         userSocketMap[userId] = socket.id
         console.log("Updated userSocketMap:", userSocketMap);

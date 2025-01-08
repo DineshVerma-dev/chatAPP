@@ -4,11 +4,11 @@ import { io } from "socket.io-client";
 import Users from "../Components/Users";
 
 const Dashboard = () => {
-  const [currentUser, setCurrentUser] = useState(""); // Logged-in user
-  const [selectedUser, setSelectedUser] = useState(null); // Selected user for chat
-  const [message, setMessage] = useState(""); // Message input
-  const [messages, setMessages] = useState([]); // Chat messages
-  const [socket, setSocket] = useState(null); // Socket instance
+  const [currentUser, setCurrentUser] = useState(""); 
+  const [selectedUser, setSelectedUser] = useState(null); 
+  const [message, setMessage] = useState("");
+  const [messages, setMessages] = useState([]);
+  const [socket, setSocket] = useState(null);
 
   // Initialize Socket.IO connection
   useEffect(() => {
@@ -29,6 +29,12 @@ const Dashboard = () => {
       setMessages((prevMessages) => [...prevMessages, data]);
     });
 
+    // return () => {
+    //   if (newSocket) {
+    //     newSocket.disconnect();
+    //     console.log("Socket disconnected");
+    //   }
+    // };
     
   }, []);
 
