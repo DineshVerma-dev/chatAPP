@@ -10,18 +10,27 @@ const Dashboard = () => {
   const [messages, setMessages] = useState([]);
   const [socket, setSocket] = useState(null);
 
-  // Initialize Socket.IO connection
+ 
   useEffect(() => {
-    const currentuserId = localStorage.getItem("userId")
+    const currentuserId = localStorage.getItem("userId");
+
+    if (!currentuserId) {
+      console.error("User ID not found in localStorage");
+      return;
+    }
+
+    console.log("dash",currentuserId)
+
     const newSocket = io("http://localhost:3000", {
       withCredentials: true,
-      query: {currentuserId}, // Pass current user ID to the server
+      query: { currentuserId }, 
     });
 
     setSocket(newSocket);
 
     newSocket.on("connect", () => {
       console.log("Connected to server via socket:", newSocket.id);
+      newSocket.emit("registerUser", { userId: currentuserId })
     });
 
     newSocket.on("newMessage", (data) => {
@@ -29,12 +38,12 @@ const Dashboard = () => {
       setMessages((prevMessages) => [...prevMessages, data]);
     });
 
-    // return () => {
-    //   if (newSocket) {
-    //     newSocket.disconnect();
-    //     console.log("Socket disconnected");
-    //   }
-    // };
+    return () => {
+      if (newSocket) {
+        newSocket.disconnect();
+        console.log("Socket disconnected in dashboard");
+      }
+    };
     
   }, []);
 
@@ -60,7 +69,7 @@ const Dashboard = () => {
 
       console.log("Message sent successfully:", data);
 
-      // Emit the message via socket for real-time updates
+    
       socket.emit("sendMessage", data);
 
       // Update the local message state
