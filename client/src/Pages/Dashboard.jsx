@@ -29,10 +29,8 @@ const Dashboard = () => {
       setMessages((prevMessages) => [...prevMessages, data]);
     });
 
-    return () => {
-      newSocket.disconnect();
-    };
-  }, [currentUser]);
+    
+  }, []);
 
   
 
