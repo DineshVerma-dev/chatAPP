@@ -3,43 +3,21 @@ import { MessageModel } from "../models/MessageModel.js";
 import { io, getReceiverSocketId } from "../utils/socket.js";
 
 
-
-// export const allMessages = asyncHandler(async (req, res) => {
-//     try {
-//         const {  userToChatId } = req.body;
-//         const myId = req.user._id;
-
-//         const messages = await MessageModel.find({
-//             $or: [
-//                 { senderId: myId, receiverId: userToChatId },
-//                 { senderId: userToChatId, receiverId: myId },
-//             ],
-//         });
-//         if(!messages){
-//             res.json({messages : "not found any message"})
-//         }
-//         res.status(200).json(messages);
-//     } catch (error) {
-//         console.log("Error in getMessages controller: ", error.message);
-//         res.status(500).json({ error: "Internal server error" });
-//     }
-// });
-
 export const allMessages = asyncHandler(async (req, res) => {
     try {
-        // Log the incoming request body
+      
         console.log("Request Body:", req.body);
 
-        // Extract userToChatId and myId
+       
         const { userToChatId } = req.body;
         const myId = req.user._id;
 
-        // Log the user IDs
+       
         console.log("myId:", myId);
         console.log("userToChatId:", userToChatId);
 
-        // Query the database for messages
-        console.log("Querying database for messages...");
+       
+        
         const messages = await MessageModel.find({
             $or: [
                 { senderId: myId, receiverId: userToChatId },
@@ -47,19 +25,19 @@ export const allMessages = asyncHandler(async (req, res) => {
             ],
         });
 
-        // Log the result of the query
+       
         console.log("Messages found:", messages);
 
-        // Check if messages are found
+       
         if (!messages || messages.length === 0) {
             console.log("No messages found for this conversation.");
             return res.json({ messages: "Not found any message" });
         }
 
-        // Return the messages
+      
         res.status(200).json(messages);
     } catch (error) {
-        // Log any errors
+       
         console.log("Error in getMessages controller:", error.message);
         res.status(500).json({ error: "Internal server error" });
     }
