@@ -3,7 +3,7 @@
 // import { useLocation } from "react-router-dom";
 // import axios from "axios";
 
-// const Users = ({ setSelectedUser  }) => {
+// const Users = ({ setSelectedUser, unreadMessages }) => {
 //   const location = useLocation();
 //   const currentUser = location.state?.currentUser || "Guest";
 //   const [users, setUsers] = useState([]);
@@ -21,7 +21,7 @@
 //         );
 //         if (response.data.users) {
 //           setUsers(response.data.users);
-//           console.log(response.data)
+//           console.log(response.data);
 //         } else {
 //           setUsers([]);
 //         }
@@ -37,7 +37,10 @@
 
 //   return (
 //     <div className="container mx-auto p-4">
-//       <div className="font-bold mt-6 text-lg text-center">Welcome {currentUser}</div>
+//       <div className="font-bold mt-6 text-lg text-center">
+//         Welcome {currentUser}
+//       </div>
+
 //       <div className="my-4">
 //         <input
 //           onChange={(e) => setFilter(e.target.value)}
@@ -57,10 +60,19 @@
 //           users.map((user) => (
 //             <div
 //               key={user._id}
-//               className="cursor-pointer p-2 rounded bg-gray-800 hover:bg-gray-700"
+//               className={`cursor-pointer p-2 rounded bg-gray-800 hover:bg-gray-700 ${
+//                 unreadMessages?.[user._id] ? "bg-yellow-500" : ""
+//               }`}
 //               onClick={() => setSelectedUser(user)}
 //             >
-//               {user.username} 
+//               <div className="flex justify-between items-center">
+//                 <span>{user.username}</span>
+//                 {unreadMessages?.[user._id] && (
+//                   <span className="bg-red-500 text-white text-xs px-2 py-1 rounded-full">
+//                     {unreadMessages[user._id]}
+//                   </span>
+//                 )}
+//               </div>
 //             </div>
 //           ))
 //         )}
@@ -73,12 +85,9 @@
 
 
 import { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
 import axios from "axios";
 
 const Users = ({ setSelectedUser, unreadMessages }) => {
-  const location = useLocation();
-  const currentUser = location.state?.currentUser || "Guest";
   const [users, setUsers] = useState([]);
   const [filter, setFilter] = useState("");
   const [loading, setLoading] = useState(false);
@@ -110,10 +119,7 @@ const Users = ({ setSelectedUser, unreadMessages }) => {
 
   return (
     <div className="container mx-auto p-4">
-      <div className="font-bold mt-6 text-lg text-center">
-        Welcome {currentUser}
-      </div>
-
+      {/* Search Bar */}
       <div className="my-4">
         <input
           onChange={(e) => setFilter(e.target.value)}
@@ -123,9 +129,11 @@ const Users = ({ setSelectedUser, unreadMessages }) => {
         />
       </div>
 
+      {/* Loading and Error States */}
       {loading && <div className="text-center">Loading...</div>}
       {error && <div className="text-red-500 text-center">{error}</div>}
 
+      {/* User List */}
       <div className="grid grid-cols-1 gap-4">
         {users.length === 0 ? (
           <div className="text-center col-span-full">No users found.</div>
@@ -155,3 +163,4 @@ const Users = ({ setSelectedUser, unreadMessages }) => {
 };
 
 export default Users;
+
