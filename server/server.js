@@ -2,7 +2,7 @@ import express from 'express';
 import connectDB from './DataBase/db.js';
 import userRouter from './routes/userRoute.js';
 
-import messageRouter from "./routes/messageRoute.js"
+import router from "./routes/messageRoute.js"
 import dotenv from "dotenv"
 import cors from "cors"
 import { app, server } from "./utils/socket.js";
@@ -25,7 +25,7 @@ app.get('/', (req, res) => {
 
 app.use("/api/v1/user", userRouter);
 
-app.use("/api/v1/message", messageRouter)
+app.use("/api/v1/message", router)
 
 server.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
