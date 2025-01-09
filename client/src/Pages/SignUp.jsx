@@ -107,7 +107,7 @@ const SignUp = () => {
         console.log("Online users:", userId);
       });
       // Navigate to the dashboard
-      navigate("/dashboard");
+      navigate("/dashboard", { state: { currentUser: username }} );
 
     } catch (error) {
       console.error('Registration error:', error);
