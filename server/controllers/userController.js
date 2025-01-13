@@ -33,7 +33,7 @@ export const registerUser = asyncHandler(async (req, res) => {
         picture
     });
 
-    const token = jwt.sign({user : user._id }, process.env.JWT_SECRET, { expiresIn: "1h" });
+    const token = jwt.sign({user : {_id: user._id} }, process.env.JWT_SECRET, { expiresIn: "1h" });
     if (user) {
         res.status(201).json({
             message: "User Created Successfully",
@@ -67,7 +67,7 @@ export const loginUser = asyncHandler(async (req, res) => {
     const user = await UserModel.findOne({ email });
     const isPasswordCorrect = await user.comparePassword(password);
     if (user && isPasswordCorrect) {
-        const token = jwt.sign({ user :user._id }, process.env.JWT_SECRET, { expiresIn: "1h" });
+        const token = jwt.sign({ user :{_id : user._id} }, process.env.JWT_SECRET, { expiresIn: "1h" });
         res.json({
             message: "user login Successfully",
             _id: user._id,

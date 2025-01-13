@@ -21,7 +21,7 @@ export const allMessages = asyncHandler(async (req, res) => {
         const messages = await MessageModel.find({
             $or: [
                 { senderId: myId, receiverId: userToChatId },
-                { senderId: userToChatId, receiverId: myId },
+                { senderId: userToChatId, receiverId: myId }
             ],
         });
 
@@ -46,7 +46,7 @@ export const allMessages = asyncHandler(async (req, res) => {
 export const sendMessage = asyncHandler(async (req, res) => {
     try {
 
-        const senderId = req.user;
+        const senderId = req.user._id;
         const { content, receiverId } = req.body;
 
 

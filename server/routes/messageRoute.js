@@ -6,4 +6,4 @@ const router = Router();
 router.route("/").get( jwtAuthMiddleware,allMessages);
 router.route("/send").post( jwtAuthMiddleware,sendMessage);
 
-export default router;
+export default router; 
