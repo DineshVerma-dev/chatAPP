@@ -6,8 +6,7 @@ const Chat = ({ selectedUser }) => {
 
   const handleSendMessage = () => {
     if (message.trim()) {
-      // Here you would emit the message to the server using Socket.io
-      // For now, we're just adding it locally to simulate the behavior.
+      
       setMessages([...messages, { from: 'You', text: message }]);
       setMessage('');
     }

@@ -109,9 +109,9 @@ const Dashboard = () => {
         />
       </div>
 
-      {/* Chat Area */}
+     
       <div className="w-2/3 flex flex-col p-6">
-        {/* Header */}
+       
         <div className="mb-6">
           {selectedUser ? (
             <h2 className="text-2xl font-bold text-blue-400">
@@ -124,7 +124,7 @@ const Dashboard = () => {
           )}
         </div>
 
-        {/* Messages */}
+       
         <div className="flex-1 overflow-y-auto bg-gray-700 p-4 rounded-lg shadow-lg space-y-4">
           {messages
             .filter(
@@ -155,7 +155,7 @@ const Dashboard = () => {
           <div ref={messagesEndRef}></div>
         </div>
 
-        {/* Input Area */}
+       
         <div className="mt-4 flex items-center">
           <input
             type="text"
